@@ -97,7 +97,9 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                 }
                 None => {
                     return ActorResponse::Update(Box::pin(future::ready(Err(
-                        ARError::ReadWriteError("memory store: read failed!".to_string()),
+                        ARError::ReadWriteError(
+                            "memory store: read failed in actor message update!".to_string(),
+                        ),
                     ))))
                 }
             },
@@ -107,7 +109,9 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                         Some(c) => c,
                         None => {
                             return ActorResponse::Get(Box::pin(future::ready(Err(
-                                ARError::ReadWriteError("memory store: read failed!".to_string()),
+                                ARError::ReadWriteError(
+                                    "memory store: read failed in actor message get!".to_string(),
+                                ),
                             ))))
                         }
                     };
@@ -122,13 +126,15 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                     Some(d) => d,
                     None => {
                         return ActorResponse::Expire(Box::pin(future::ready(Err(
-                            ARError::ReadWriteError("memory store: read failed!".to_string()),
+                            ARError::ReadWriteError(
+                                "memory store: read failed in actor message expire!".to_string(),
+                            ),
                         ))))
                     }
                 };
                 let dur = c.value().1;
                 let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-                let res = dur.checked_sub(now).unwrap_or_else(|| Duration::new(0,0));
+                let res = dur.checked_sub(now).unwrap_or_else(|| Duration::new(0, 0));
                 ActorResponse::Expire(Box::pin(future::ready(Ok(res))))
             }
             ActorMessage::Remove(key) => {
